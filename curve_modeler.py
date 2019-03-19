@@ -1,7 +1,5 @@
 import csv
 
-#bharat kumar
-
 def parser_csv(filename):
     data = []
     with open(filename) as csv_file:

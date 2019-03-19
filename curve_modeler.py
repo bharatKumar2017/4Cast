@@ -121,7 +121,7 @@ def get_curves(points):
     end_index = 0;
     for i in range(1, n):
         if split[i] == split[i - 1]:
-            end_index++
+            end_index = end_index + 1
         else:
             new_tuple = (start_index, end_index)
             split_intervals.append(new_tuple)

@@ -115,3 +115,34 @@ def get_curves(points):
 
     for i in range(0, p):
         split[sorted_error[0]] = True
+
+    split_intervals = []
+    start_index = 0;
+    end_index = 0;
+    for i in range(1, n):
+        if split[i] == split[i - 1]:
+            end_index++;
+        else:
+            new_tuple = (start_index, end_index)
+            split_intervals.append(new_tuple)
+            start_index = end_index
+            end_index = start_index
+
+    if end_index != start_index:
+        new_tuple = (start_index, end_index)
+        split_intervals.append(new_tuple)
+
+    number_of_functions = len(split_intervals)
+    functions = [[0 for i in range(0, n)] for j in range(0, number_of_functions)]
+
+    for i in range(0, number_of_functions):
+        list_points = []
+        start_index = split_intervals[i][0]
+        end_index = split_intervals[i][1]
+
+        for j in range(start_index, end_index + 1):
+            list_points.append(points[j])
+
+        degree = n
+        curve = get_curve(list_points, degree)
+        functions[i]  = curve

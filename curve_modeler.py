@@ -9,16 +9,16 @@ def parser_csv(filename):
 
     return data
 
-def get_curve(data_points, degree):
-    n = degree
+def get_curve(data_points):
+    n = len(data_points) - 1
 
     matrix = [[0 for i in range(0, n + 1)] for  j in range(0, n + 1)]
 
     coefficients = []
 
-    range_n = 2 * n
+    range_n = (2 * n) + 1
 
-    i = len(data_points)
+    i = n + 1
 
     for k in range(0, range_n):
         sum = 0
@@ -26,13 +26,14 @@ def get_curve(data_points, degree):
             sum += pow(data_points[l][0], range_n - k)
         coefficients.append(sum)
 
+    i = 0
     for i in range(0, n):
         for j in range(0, n):
             matrix[i][j] = coefficients[i + j]
 
     values = []
 
-    for i in range(0, n):
+    for i in range(0, n + 1):
         values.append(matrix[i][n - 1])
 
     return get_solution_vector(matrix, values)
@@ -70,33 +71,47 @@ def get_pivot_position(matrix, pivot_row_index, n):
     index = 0
     while pivot_value == 0 and index < n:
         index = index + 1
-        pivot_value = matrix[pivot_row_index][index]
+
+        if index < n:
+            pivot_value = matrix[pivot_row_index][index]
 
     return index
 
 def get_ratio(matrix, row_index, pivot_row_index, pivot_row_position, n):
-    ratio = (-1 * matrix[row_index][pivot_row_position]) / matrix[pivot_row_index][pivot_row_position]
+    ratio = (-1.0 * matrix[row_index][pivot_row_position]) / matrix[pivot_row_index][pivot_row_position]
     return ratio
 
 #[x[0], x[1], ... , x[n]]
 def get_solution_vector(matrix, values):
     n = len(matrix)
 
-    new_matrix = matrix
-    new_values = values
+    x = len(values)
+
+    print(n)
+
+
+    new_matrix = [[0 for i in range(0, n)] for j in range(0, n)]
+    new_values = [0 for i in range(0, n)]
 
     for i in range(0, n):
-        print("MATRIX")
-        print(new_matrix)
-        print("VALUES")
-        print(new_values)
+        for j in range(0, n):
+            new_matrix[i][j] = matrix[i][j]
+        new_values[i] = values[i]
+
+    for i in range(0, n):
         pivot_position = get_pivot_position(new_matrix, i, n)
-        string = "Pivot Position = " + str(pivot_position)
-        print(string)
         new_values = update_all_values(new_values, new_matrix, i, pivot_position, n)
         new_matrix = update_all_rows(new_matrix, i, pivot_position, n)
 
-    return new_matrix
+    coefficients = [0 for i in range(0, n)]
+
+    for i in range(0, n):
+        pivot_position = get_pivot_position(new_matrix, i, n)
+        matrix_value = new_matrix[i][pivot_position]
+        coefficient = (1.0 * new_values[i]) / matrix_value
+        coefficients[pivot_position] = coefficient
+
+    return coefficients
 
 def f(x, model):
     n = len(model)
@@ -174,11 +189,20 @@ def get_curves(points):
         curve = get_curve(list_points, degree)
         functions[i]  = curve
 
-def test():
-    matrix = [[1, 2, 3, 4],[2, 3, 1, 5], [3, 1, 2, 2], [3, 5, 2, 1]]
-    values = [1, 2, 3, 4]
-    solution = get_solution_vector(matrix, values)
+def print_matrix(matrix):
+    string = ""
 
-    print(solution)
+    for i in range(0, len(matrix)):
+        for j in range(0, len(matrix)):
+            string += str(matrix[i][j]) + "\t"
+        string += "\n"
+
+    print(string)
+
+def test():
+    data_points = [(1, 1.25), (2, 0.94), (3, 0.65), (4, 0.62), (5, 0.87), (6, 0.94)]
+    model = get_curve(data_points)
+
+    print(model)
 
 test()

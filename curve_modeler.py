@@ -18,30 +18,56 @@ def get_curve(data_points):
 
     range_n = (2 * n) + 1
 
-    i = n + 1
+    i = len(data_points)
 
     for k in range(0, range_n):
         sum = 0
         for l in range(0, i):
-            sum += pow(data_points[l][0], range_n - k)
+            sum += pow(1.0 * data_points[l][0], (2 * n) - k)
         coefficients.append(sum)
 
+    print("COEFFICIENTS")
+    print(coefficients)
+
     i = 0
-    for i in range(0, n):
-        for j in range(0, n):
+    for i in range(0, n + 1):
+        for j in range(0, n + 1):
             matrix[i][j] = coefficients[i + j]
 
     values = []
 
+    x_powered_matrix = [[0 for i in range(0, n + 1)] for j in range(0, n + 1)]
+
     for i in range(0, n + 1):
-        values.append(matrix[i][n - 1])
+        x_powered_matrix[n][i] = 1.0
+
+    for i in range(0, n):
+        for j in range(0, n + 1):
+            x_powered_matrix[n - 1 - i][j] = data_points[j][0] * x_powered_matrix[n - i][j]
+
+    y_values = []
+
+    for i in range(0, n + 1):
+        sum = 0
+        for j in range(0, n + 1):
+            sum += x_powered_matrix[i][j] * data_points[j][1]
+        y_values.append(sum)
+
+    for i in range(0, n + 1):
+        values.append(y_values[i])
+
+    print("MATRIX")
+    print_matrix(matrix)
+
+    print("VALUES")
+    print(values)
 
     return get_solution_vector(matrix, values)
 
 def update_row(matrix, row_index, ratio, pivot_row_index, n):
     row = []
     for i in range(0, n):
-        v = (ratio * matrix[pivot_row_index][i]) + matrix[row_index][i]
+        v = (1.0 * ratio * matrix[pivot_row_index][i]) + matrix[row_index][i]
         row.append(v)
 
     return row
@@ -69,7 +95,7 @@ def update_all_values(values, matrix, pivot_row_index, pivot_position, n):
 def get_pivot_position(matrix, pivot_row_index, n):
     pivot_value = matrix[pivot_row_index][0]
     index = 0
-    while pivot_value == 0 and index < n:
+    while pivot_value <= 0.0000000001 and index < n:
         index = index + 1
 
         if index < n:
@@ -81,14 +107,9 @@ def get_ratio(matrix, row_index, pivot_row_index, pivot_row_position, n):
     ratio = (-1.0 * matrix[row_index][pivot_row_position]) / matrix[pivot_row_index][pivot_row_position]
     return ratio
 
-#[x[0], x[1], ... , x[n]]
+#[x[n], x[n - 1], ... , x[0]]
 def get_solution_vector(matrix, values):
     n = len(matrix)
-
-    x = len(values)
-
-    print(n)
-
 
     new_matrix = [[0 for i in range(0, n)] for j in range(0, n)]
     new_values = [0 for i in range(0, n)]
@@ -126,7 +147,7 @@ def f(x, model):
     value = 0
 
     for i in range(0, n):
-        v = model[i] * x_powered
+        v = model[i] * x_powered[n - 1 - i]
         value += v
 
     return value
@@ -200,9 +221,14 @@ def print_matrix(matrix):
     print(string)
 
 def test():
-    data_points = [(1, 1.25), (2, 0.94), (3, 0.65), (4, 0.62), (5, 0.87), (6, 0.94)]
+    data_points = [(1, 1.25), (2, 0.94), (3, 0.65), (4, 0.62), (5, 0.87)]
+    #(6, 0.94), (7, 1.14), (8, 1.72), (9, 1.83), (10, 2.12), (11, 1.91), (12, 1.80), (13, 2.25), (14, 2.08), (15, 1.73)]
     model = get_curve(data_points)
 
+    y = f(3, model)
+
     print(model)
+
+    print((3, y))
 
 test()

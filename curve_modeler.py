@@ -25,10 +25,7 @@ def get_curve(data_points):
         for l in range(0, i):
             sum += pow(1.0 * data_points[l][0], (2 * n) - k)
         coefficients.append(sum)
-
-    print("COEFFICIENTS")
-    print(coefficients)
-
+    
     i = 0
     for i in range(0, n + 1):
         for j in range(0, n + 1):
@@ -55,12 +52,6 @@ def get_curve(data_points):
 
     for i in range(0, n + 1):
         values.append(y_values[i])
-
-    print("MATRIX")
-    print_matrix(matrix)
-
-    print("VALUES")
-    print(values)
 
     return get_solution_vector(matrix, values)
 
@@ -220,15 +211,48 @@ def print_matrix(matrix):
 
     print(string)
 
+def convert_model_to_string(model):
+    model_string = "y = "
+
+    n = len(model)
+
+    model_string += str(model[0]) + "(x^" + str(n - 1) + ")"
+    for i in range(1, n):
+        if i < n - 2:
+            if model[i] < 0:
+                model_string += " - " + str((-1 * model[i])) + "(x^" + str(n - i - 1) + ")"
+            else:
+                model_string += " + " + str(model[i]) + "(x^" + str(n - i - 1) + ")"
+        else:
+            if i == n - 2:
+                if model[i] < 0:
+                    model_string += " - " + str((-1 * model[i])) + "x"
+                else:
+                    model_string += " + " + str(model[i]) + "x"
+            else:
+                if model[i] < 0:
+                    model_string += " - " + str((-1 * model[n - 1]))
+                else:
+                    model_string += " + " + str(model[i])
+    return model_string
+
 def test():
-    data_points = [(1, 1.25), (2, 0.94), (3, 0.65), (4, 0.62), (5, 0.87)]
-    #(6, 0.94), (7, 1.14), (8, 1.72), (9, 1.83), (10, 2.12), (11, 1.91), (12, 1.80), (13, 2.25), (14, 2.08), (15, 1.73)]
+    data_points = [(1, 1.25), (2, 0.94), (3, 0.65), (4, 0.62), (5, 0.87), (6, 0.94), (7, 1.14)]
+    #, (8, 1.72), (9, 1.83), (10, 2.12), (11, 1.91), (12, 1.80), (13, 2.25), (14, 2.08), (15, 1.73)]
     model = get_curve(data_points)
 
-    y = f(3, model)
-
+    print("MODEL (matrix form: A[k] = coefficient for term with k exponent)")
     print(model)
+    print("\n")
 
-    print((3, y))
+    model_string = convert_model_to_string(model)
+
+    print("MODEL (equation form)")
+    print(model_string)
+
+    print("\n")
+    print("EXAMPLES")
+    y = f(7, model)
+    print((7, y))
 
 test()

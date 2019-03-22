@@ -239,8 +239,13 @@ def convert_model_to_string(model):
 def test():
     data_points = [(1, 1.25), (2, 0.94), (3, 0.65), (4, 0.62), (5, 0.87), (6, 0.94), (7, 1.14)]
     #, (8, 1.72), (9, 1.83), (10, 2.12), (11, 1.91), (12, 1.80), (13, 2.25), (14, 2.08), (15, 1.73)]
-    model = get_curve(data_points)
 
+    print("DATA POINTS")
+    print(data_points)
+    print("\n")
+
+    model = get_curve(data_points)
+    
     print("MODEL (matrix form: A[k] = coefficient for term with k exponent)")
     print(model)
     print("\n")
@@ -253,8 +258,9 @@ def test():
     print("\n")
     print("EXAMPLES")
 
-    x = 2
-    
+    print("x = ?")
+    x = int(input())
+
     y = f(x, model)
     print((x, y))
 

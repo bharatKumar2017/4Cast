@@ -25,7 +25,7 @@ def get_curve(data_points):
         for l in range(0, i):
             sum += pow(1.0 * data_points[l][0], (2 * n) - k)
         coefficients.append(sum)
-    
+
     i = 0
     for i in range(0, n + 1):
         for j in range(0, n + 1):
@@ -252,7 +252,10 @@ def test():
 
     print("\n")
     print("EXAMPLES")
-    y = f(7, model)
-    print((7, y))
+
+    x = 2
+    
+    y = f(x, model)
+    print((x, y))
 
 test()

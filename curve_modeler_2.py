@@ -244,7 +244,7 @@ def test():
     print(data_points)
     print("\n")
 
-    model = split_function(data_points, 0.005)
+    model = get_curves(data_points, 0.005)
 
     print("Average Error = 0.5%\n")
 
@@ -256,7 +256,7 @@ def test():
     print("\n")
     print("EXAMPLES")
 
-    test_data = test_model_split(model, data_points)
+    test_data = test_model(model, data_points)
 
     print(test_data)
 

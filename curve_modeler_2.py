@@ -156,6 +156,16 @@ def test_model(model, data_points):
 
     return model_points
 
+def get_all_points_interval(data_points, intervals):
+    points = []
+
+    for i in range(0, len(data_points)):
+        point = data_points[i]
+        if point[0] >= intervals[0] and point[1] <= intervals[1]:
+            points.append(point)
+
+    return points
+
 def split_function(data_points, tolerance):
     n = len(data_points)
     model = get_curves(data_points, tolerance)
@@ -163,7 +173,7 @@ def split_function(data_points, tolerance):
     split = [False for i in range(0, n)]
 
     for i in range(0, n):
-        if get_error(data_points[i][0], model, data_points):
+        if get_error(data_points[i][0], model, data_points) > 0.005:
             split[i] = True
 
     points = []
@@ -174,36 +184,25 @@ def split_function(data_points, tolerance):
     intervals = []
 
     for i in range(1, n):
-        if split[i] == split[i - 1]:
+        points.append(data_points[i])
+
+        if split[i] != split[i - 1] or i == n - 1:
             points.append(data_points[i])
-        else:
-            points.append(data_points[i])
-            model = get_curves_max(points, 0.005)
             tuple = (points[0][0], data_points[i][0])
-            models.append(model)
             intervals.append(tuple)
+            points = []
 
-    v = len(models)
+    models = []
 
-    if v == 0:
-        model = get_curves_max(points, 0.005)
-        tuple = (points[0][0], data_points[n - 1][0])
-        models.append(model)
-        intervals.append(tuple)
-
-    print(intervals)
-    models_final = []
-    intervals_final = []
     v = len(intervals)
 
-    print(v)
     for i in range(0, v):
-        if models[i] != None:
-            models_final.append(models[i])
-            intervals_final.append(intervals[i])
+        points = get_all_points_interval(data_points, intervals[i])
+        model = get_curves_max(points, tolerance)
+        print(model)
+        models.append(model)
 
-    print(models_final)
-    models_and_intervals = (models_final, intervals_final)
+    models_and_intervals = (models, intervals)
 
     print(models_and_intervals)
     return models_and_intervals

@@ -179,6 +179,18 @@ def convert_model_to_string(model):
                     model_string += " + " + str(model[i])
     return model_string
 
+def convert_models_to_string(model):
+    models = model[0]
+    intervals = model[1]
+
+    n = len(models)
+    model_string = ""
+    for i in range(0, n):
+        model_string += convert_model_to_string(models[i])
+        model_string += "; x = " + str(intervals[i]) + "\n"
+
+    return model_string
+
 def test_model(model, data_points):
     model_points = []
     n = len(data_points)
@@ -243,10 +255,6 @@ def split_function(data_points, tolerance):
     for i in range(0, v):
         points = get_all_points_interval(data_points, intervals[i])
         model = get_curves(points, tolerance)
-        print("POINTS at position " + str(i))
-        print(points)
-        print("MODEL at position " + str(i))
-        print(model)
         models.append(model)
 
     models_and_intervals = (models, intervals)
@@ -337,10 +345,10 @@ def test2():
 
     print("Average Error = " + str(tolerance) + "%\n")
 
-    #model_string = convert_model_to_string(model)
+    model_string = convert_models_to_string(model)
 
-    #print("MODEL (equation form)")
-    #print(model_string)
+    print("MODEL (equation form)")
+    print(model_string)
 
     print("\n")
     print("EXAMPLES")

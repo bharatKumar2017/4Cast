@@ -2,6 +2,27 @@ import csv
 import numpy
 import math
 
+def parser_csv(filename):
+    data = []
+    with open(filename) as csv_file:
+        reader = csv.reader(csv_file, delimiter=',')
+        for row in reader:
+            data.append(row)
+
+    return data
+
+def get_points(data, row):
+    n = len(data[row])
+
+    points = []
+    for i in range(0, n):
+        x = data[i][i]
+        y = data[row][j]
+        tuple = (float(x), float(y))
+        points.append(tuple)
+
+    return points
+
 def get_curve(data_points, degree):
     x_data = []
     y_data = []
@@ -19,7 +40,9 @@ def get_average_error(model, data_points):
     error = 0
     for i in range(0, n):
         e_percentage = (data_points[i][1] - f(data_points[i][0], model)) / (1.0 * data_points[i][1])
-        error += (e_percentage * e_percentage)
+        if e_percentage < 0:
+            e_percentage = -1 * e_percentage
+        error += e_percentage
 
     avg = (1.0 * error) / n
 
@@ -53,7 +76,10 @@ def boolean_function(error, tolerance):
 
 def get_curves(data_points, tolerance):
     upper_bound = len(data_points) - 1
-    lower_bound = 0
+    lower_bound = 1
+
+    model = []
+
     while upper_bound > lower_bound + 1:
         mid = (upper_bound + lower_bound) / 2
         degree = mid
@@ -68,6 +94,14 @@ def get_curves(data_points, tolerance):
             lower_bound = mid
         elif c < 0:
             upper_bound = mid
+
+    if model == None:
+        model = get_curve(data_points, len(data_points) - 1)
+        return model
+
+    if len(model) == 0:
+        model = get_curve(data_points, len(data_points) - 1)
+        return model
 
     return model
 
@@ -107,7 +141,7 @@ def f(x, model):
     n = len(model)
     x_powered = [0 for i in range(0, n)]
 
-    x_powered[0] = 1
+    x_powered[0] = 1.0
 
     for i in range(1, n):
         x_powered[i] = x * x_powered[i - 1]
@@ -161,7 +195,7 @@ def get_all_points_interval(data_points, intervals):
 
     for i in range(0, len(data_points)):
         point = data_points[i]
-        if point[0] >= intervals[0] and point[1] <= intervals[1]:
+        if point[0] >= intervals[0] and point[0] <= intervals[1]:
             points.append(point)
 
     return points
@@ -173,7 +207,9 @@ def split_function(data_points, tolerance):
     split = [False for i in range(0, n)]
 
     for i in range(0, n):
-        if get_error(data_points[i][0], model, data_points) > 0.005:
+        y_expected = 1.0 * f(data_points[i][0], model)
+        error = (y_expected - data_points[i][1]) / (data_points[i][1])
+        if error > tolerance:
             split[i] = True
 
     points = []
@@ -184,13 +220,21 @@ def split_function(data_points, tolerance):
     intervals = []
 
     for i in range(1, n):
-        points.append(data_points[i])
-
-        if split[i] != split[i - 1] or i == n - 1:
+        if split[i] == split[i - 1]:
             points.append(data_points[i])
+        elif split[i] != split[i - 1]:
+            if len(points) == 1:
+                points.append(data_points[i])
+
             tuple = (points[0][0], data_points[i][0])
             intervals.append(tuple)
             points = []
+            points.append(data_points[i])
+
+
+    if len(points) > 0:
+        tuple = (points[0][0], data_points[n - 1][0])
+        intervals.append(tuple)
 
     models = []
 
@@ -198,13 +242,14 @@ def split_function(data_points, tolerance):
 
     for i in range(0, v):
         points = get_all_points_interval(data_points, intervals[i])
-        model = get_curves_max(points, tolerance)
+        model = get_curves(points, tolerance)
+        print("POINTS at position " + str(i))
+        print(points)
+        print("MODEL at position " + str(i))
         print(model)
         models.append(model)
 
     models_and_intervals = (models, intervals)
-
-    print(models_and_intervals)
     return models_and_intervals
 
 def f_split(x, function):
@@ -237,21 +282,28 @@ def test_model_split(model, data_points):
 
     return model_points
 
-def test():
+def test1():
+    #data = parser_csv("Lite_MC_Attrition.csv")
+    #data_points = get_points(data, 1)
+
     data_points = [(1, 1.25), (2, 0.94), (3, 0.65), (4, 0.62), (5, 0.87), (6, 0.94), (7, 1.14), (8, 1.72), (9, 1.83), (10, 2.12), (11, 1.91), (12, 1.80), (13, 2.25), (14, 2.08), (15, 1.73)]
 
     print("DATA POINTS")
     print(data_points)
     print("\n")
 
-    model = get_curves(data_points, 0.005)
+    print("TOlERANCE = ?")
 
-    print("Average Error = 0.5%\n")
+    tolerance = float(raw_input())
 
-    #model_string = convert_model_to_string(model)
+    model = get_curves(data_points, (tolerance / 100))
+
+    print("Average Error = " + str(tolerance) + "%\n")
+
+    model_string = convert_model_to_string(model)
 
     print("MODEL (equation form)")
-    #print(model_string)
+    print(model_string)
 
     print("\n")
     print("EXAMPLES")
@@ -262,11 +314,49 @@ def test():
 
     while True:
         print("x = ?")
-        string = input()
-        if string == "quit":
+        string = raw_input()
+        if string == 'quit':
             return 0
-        x = int(string)
+        x = float(string)
+        y = f(x, model)
+        print((x, y))
+        print("\n")
+
+def test2():
+    data_points = [(1, 1.25), (2, 0.94), (3, 0.65), (4, 0.62), (5, 0.87), (6, 0.94), (7, 1.14), (8, 1.72), (9, 1.83), (10, 2.12), (11, 1.91), (12, 1.80), (13, 2.25), (14, 2.08), (15, 1.73)]
+
+    print("DATA POINTS")
+    print(data_points)
+    print("\n")
+
+    print("TOlERANCE = ?")
+
+    tolerance = float(raw_input())
+
+    model = split_function(data_points, (tolerance / 100))
+
+    print("Average Error = " + str(tolerance) + "%\n")
+
+    #model_string = convert_model_to_string(model)
+
+    #print("MODEL (equation form)")
+    #print(model_string)
+
+    print("\n")
+    print("EXAMPLES")
+
+    test_data = test_model_split(model, data_points)
+
+    print(test_data)
+
+    while True:
+        print("x = ?")
+        string = raw_input()
+        if string == 'quit':
+            return 0
+        x = float(string)
         y = f_split(x, model)
         print((x, y))
+        print("\n")
 
-test()
+test2()

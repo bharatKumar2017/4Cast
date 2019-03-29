@@ -16,8 +16,8 @@ def get_points(data, row):
 
     points = []
     for i in range(0, n):
-        x = data[i][i]
-        y = data[row][j]
+        x = data[0][i]
+        y = data[row][i]
         tuple = (float(x), float(y))
         points.append(tuple)
 
@@ -326,13 +326,13 @@ def group_models(functions):
     for i in range(0, n):
         g = split_function(growth[i], 0.1)
         growth_functions.append(g)
-        
+
 
 def test1():
-    #data = parser_csv("Lite_MC_Attrition.csv")
-    #data_points = get_points(data, 1)
+    data = parser_csv("Lite_MC_Attrition.csv")
+    data_points = get_points(data, 1)
 
-    data_points = [(1, 1.25), (2, 0.94), (3, 0.65), (4, 0.62), (5, 0.87), (6, 0.94), (7, 1.14), (8, 1.72), (9, 1.83), (10, 2.12), (11, 1.91), (12, 1.80), (13, 2.25), (14, 2.08), (15, 1.73)]
+    #data_points = [(1, 1.25), (2, 0.94), (3, 0.65), (4, 0.62), (5, 0.87), (6, 0.94), (7, 1.14), (8, 1.72), (9, 1.83), (10, 2.12), (11, 1.91), (12, 1.80), (13, 2.25), (14, 2.08), (15, 1.73)]
 
     print("DATA POINTS")
     print(data_points)
@@ -405,4 +405,4 @@ def test2():
         print((x, y))
         print("\n")
 
-test2()
+test1()

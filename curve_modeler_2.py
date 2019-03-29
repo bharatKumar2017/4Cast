@@ -290,6 +290,44 @@ def test_model_split(model, data_points):
 
     return model_points
 
+def get_growth_rate(function):
+    n = len(function[1])
+    range = (function[1][0][0], function[1][n - 1][1])
+
+    delta = range[0]
+    range[1] -= range[0]
+    range[0] = 0
+
+    growth = [0 for i in range(range[0], range[1])]
+
+    values = []
+
+    for i in range(0, range[1]):
+        x = i + delta
+        y = f_split(function)
+        values.append((x, y))
+
+    growth[0] = (values[0][0], values[0][1])
+    for i in range(1, range[1]):
+        growth_rate = values[i][1] / values[i - 1][1]
+        growth[i] = (values[i][0], values[i][1])
+
+    return growth
+
+def group_models(functions):
+    growth = []
+    n = len(functions)
+    for i in range(0, n):
+        g = get_growth_rate(functions[0])
+        growth.append(g)
+
+    growth_functions = []
+
+    for i in range(0, n):
+        g = split_function(growth[i], 0.1)
+        growth_functions.append(g)
+        
+
 def test1():
     #data = parser_csv("Lite_MC_Attrition.csv")
     #data_points = get_points(data, 1)

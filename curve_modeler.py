@@ -13,7 +13,6 @@ def parser_csv(filename):
 
 def get_points(data, row):
     n = len(data[row])
-
     points = []
     for i in range(0, n):
         x = data[0][i]
